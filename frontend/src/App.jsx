@@ -13,6 +13,9 @@ const careerProfiles = {
   "Cybersecurity Analyst": "Network Security, Python, Ethical Hacking, Risk Management, Linux, Cloud Security"
 }
 
+
+const API_BASE_URL = "https://grow-hkck.onrender.com";
+
 function App() {
   // Application state management
   const [skills, setSkills] = useState('')
@@ -84,7 +87,7 @@ function App() {
 
   // --- Side Effects ---
   useEffect(() => {
-    fetch('https://grow-hkck.onrender.com/stats')
+    fetch(`${API_BASE_URL}/stats`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error("Error fetching stats:", err));
@@ -109,7 +112,7 @@ function App() {
     setPlatformFilter('All')
     
     try {
-      const response = await fetch(`https://grow-hkck.onrender.com/recommend?skills=${encodeURIComponent(searchQuery)}`)
+      const response = await fetch(`${API_BASE_URL}/recommend?skills=${encodeURIComponent(searchQuery)}`)
       if (!response.ok) throw new Error('Failed to fetch recommendations')
       const data = await response.json()
       setRecommendations(data.recommendations)
