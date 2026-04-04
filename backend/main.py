@@ -1,6 +1,6 @@
+import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -14,53 +14,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load data and train model
-print("Loading data...")
-df = pd.read_csv('unified_courses.csv')
-
-# Handle brackets in instructor names & Null values
-if 'instructor' in df.columns:
-    df['instructor'] = df['instructor'].str.replace(r"[\[\]']", "", regex=True)
-    # If the instructor is empty or null, set a default value
-    df['instructor'] = df['instructor'].fillna('Expert Instructors')
-
-
-df['search_corpus'] = df['search_corpus'].fillna('')
-
-vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2))
-tfidf_matrix = vectorizer.fit_transform(df['search_corpus'])
-print("Backend Ready!")
-
-def get_difficulty_level(title):
-    """Categorizes course difficulty based on keywords in the title"""
-    title = title.lower()
-    if any(word in title for word in ['intro', 'beginner', 'foundation', 'basic', 'starting', '101']):
+def get_difficulty_score(title):
+    t = str(title).lower()
+    if any(word in t for word in ['beginner', 'intro', 'foundation', '101', 'start']):
         return {"label": "Beginner", "score": 1}
-    if any(word in title for word in ['advanced', 'expert', 'professional', 'masterclass', 'complex']):
+    if any(word in t for word in ['advanced', 'expert', 'professional', 'master', 'deep']):
         return {"label": "Advanced", "score": 3}
     return {"label": "Intermediate", "score": 2}
 
+df = pd.read_csv('unified_courses.csv')
+if 'instructor' in df.columns:
+    df['instructor'] = df['instructor'].str.replace(r"[\[\]']", "", regex=True).fillna('Expert Instructors')
 
-@app.get("/")
-def read_root():
-    return {"status": "online"}
+df['difficulty_info'] = df['title'].apply(get_difficulty_score)
+df['difficulty_label'] = df['difficulty_info'].apply(lambda x: x['label'])
+df['difficulty_score'] = df['difficulty_info'].apply(lambda x: x['score'])
 
+vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(df['search_corpus'].fillna(''))
 
 @app.get("/stats")
 def get_stats():
-    """Generates statistics for the dashboard safely"""
-    try:
-        platform_counts = df['platform'].value_counts().to_dict()
-        top_categories = df['category'].value_counts().head(5).to_dict()
-
-        return {
-            "total_courses": len(df),
-            "platform_data": [{"name": k, "value": int(v)} for k, v in platform_counts.items()],
-            "category_data": [{"name": k, "value": int(v)} for k, v in top_categories.items()]
-        }
-    except Exception as e:
-        print(f"Stats Error: {e}")
-        return {"error": "Could not load stats"}
+    category_counts = df['category'].value_counts().head(5).to_dict()
+    platform_counts = df['platform'].value_counts().to_dict()
+    return {
+        "total_courses": len(df),
+        "category_data": [{"name": k, "value": v} for k, v in category_counts.items()],
+        "platform_data": [{"name": k, "value": v} for k, v in platform_counts.items()]
+    }
 
 @app.get("/recommend")
 def get_recommendations(skills: str):
@@ -69,39 +50,45 @@ def get_recommendations(skills: str):
             return {"recommendations": []}
 
         user_vector = vectorizer.transform([skills.lower()])
-        cosine_sim = cosine_similarity(user_vector, tfidf_matrix)[0]
+        scores = cosine_similarity(user_vector, tfidf_matrix)[0]
         
+
         temp_df = df.copy()
-        temp_df['score'] = cosine_sim
-        temp_df['difficulty_label'] = temp_df['title'].apply(lambda x: get_difficulty_level(x)['label'])
-        temp_df['difficulty_score'] = temp_df['title'].apply(lambda x: get_difficulty_level(x)['score'])
+        temp_df['score'] = scores
+
+        relevant = temp_df[temp_df['score'] > 0.01].sort_values(by='score', ascending=False)
         
-        # Filter relevant courses
-        relevant_courses = temp_df[temp_df['score'] > 0.05].sort_values(by='score', ascending=False)
-        
+        if relevant.empty:
+            return {"recommendations": []}
+
         final_roadmap = []
-        # Logic: Pick top 2 for each level to create a progressive path
-        for level in [1, 2, 3]:  # 1=Beginner, 2=Intermediate, 3=Advanced
-            level_courses = relevant_courses[relevant_courses['difficulty_score'] == level].head(2)
-            
-            for _, row in level_courses.iterrows():
-                # Avoid duplicate titles (simple check)
-                if not any(row['title'][:15] in r['title'] for r in final_roadmap):
+        seen_titles = set()
+
+        for level in [1, 2, 3]:
+            level_subset = relevant[relevant['difficulty_score'] == level].head(3)
+            for _, row in level_subset.iterrows():
+                short_title = str(row['title'])[:20]
+                if short_title not in seen_titles:
                     final_roadmap.append({
-                        'title': row['title'],
-                        'category': row['category'],
-                        'instructor': row['instructor'],
-                        'platform': row['platform'],
-                        'score': row['score'],
-                        'url': row['url'],
-                        'difficulty': row['difficulty_label'],
-                        'difficulty_score': int(row['difficulty_score'])
+                        "title": row['title'],
+                        "platform": row['platform'],
+                        "category": row['category'],
+                        "instructor": row['instructor'],
+                        "score": float(row['score']),
+                        "difficulty": row['difficulty_label'],
+                        "difficulty_score": int(row['difficulty_score']),
+                        "url": row['url']
                     })
+                    seen_titles.add(short_title)
         
-        # Sort the final list by difficulty so it's always a path
         final_roadmap.sort(key=lambda x: x['difficulty_score'])
-            
-        return {"recommendations": final_roadmap}
+        
+        return {"recommendations": final_roadmap[:8]} # מחזירים עד 8 קורסים סך הכל
+        
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"CRASH ERROR: {e}") 
         return {"error": str(e)}
+
+@app.get("/")
+def home():
+    return {"status": "EduSync Backend is Online"}
