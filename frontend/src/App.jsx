@@ -84,7 +84,7 @@ function App() {
 
   // --- Side Effects ---
   useEffect(() => {
-    fetch('http://localhost:8000/stats')
+    fetch('https://grow-hkck.onrender.com/stats')
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error("Error fetching stats:", err));
@@ -109,7 +109,7 @@ function App() {
     setPlatformFilter('All')
     
     try {
-      const response = await fetch(`http://localhost:8000/recommend?skills=${encodeURIComponent(searchQuery)}`)
+      const response = await fetch(`https://grow-hkck.onrender.com/recommend?skills=${encodeURIComponent(searchQuery)}`)
       if (!response.ok) throw new Error('Failed to fetch recommendations')
       const data = await response.json()
       setRecommendations(data.recommendations)
