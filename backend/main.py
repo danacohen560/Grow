@@ -83,7 +83,7 @@ def get_recommendations(skills: str):
         
         final_roadmap.sort(key=lambda x: x['difficulty_score'])
         
-        return {"recommendations": final_roadmap[:8]} # מחזירים עד 8 קורסים סך הכל
+        return {"recommendations": final_roadmap[:8]} 
         
     except Exception as e:
         print(f"CRASH ERROR: {e}") 
