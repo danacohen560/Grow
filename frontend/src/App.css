@@ -1,16 +1,16 @@
-/* יבוא פונט מודרני והייטקיסטי */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 :root {
-  --bg-color: #f4f7fb; /* רקע אפרפר-כחלחל סופר בהיר ונעים */
-  --card-bg: #ffffff; /* כרטיסיות לבנות נקיות */
-  --text-main: #1e293b; /* כחול-ציפה כהה לטקסט (רך יותר משחור) */
-  --text-muted: #64748b; /* אפור לטקסט משני */
-  --accent-blue: #0ea5e9; /* תכלת הייטק */
-  --accent-purple: #6366f1; /* סגול-כחול אינדיגו */
-  /* גרדיאנט אופטימי וחי - מתכלת לסגול */
+  --bg-color: #f4f7fb;
+  --card-bg: #ffffff; 
+  --text-main: #1e293b; 
+  --text-muted: #64748b;
+  --accent-blue: #0ea5e9; 
+  --accent-purple: #6366f1; 
+
   --gradient-main: linear-gradient(135deg, #0ea5e9, #6366f1, #8b5cf6); 
-  --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05); /* צללית רכה */
+  --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
   --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
@@ -26,7 +26,7 @@ body {
   overflow-x: hidden;
 }
 
-/* בועות צבעוניות ורכות ברקע לאווירה אופטימית */
+
 body::before, body::after {
   content: '';
   position: absolute;
@@ -38,13 +38,13 @@ body::before, body::after {
 
 body::before {
   width: 500px; height: 500px;
-  background: #e0e7ff; /* תכלת בהיר */
+  background: #e0e7ff; 
   top: -150px; right: -100px;
 }
 
 body::after {
   width: 400px; height: 400px;
-  background: #f3e8ff; /* סגול בהיר */
+  background: #f3e8ff; 
   bottom: 100px; left: -150px;
 }
 
@@ -78,7 +78,7 @@ header {
 header p {
   color: var(--text-muted);
   font-size: 1.2rem;
-  margin-top: -5px; /* מצמצם רווח מהכותרת הגדולה */
+  margin-top: -5px; 
 }
 
 .search-section {
@@ -189,7 +189,7 @@ header p {
   border: 1px solid rgba(0, 0, 0, 0.02);
 }
 
-/* הפס הצבעוני שמופיע למטה במעבר עכבר */
+
 .category-card::after {
   content: '';
   position: absolute;
@@ -310,7 +310,7 @@ header p {
   color: var(--text-main);
   margin: 0 0 0.5rem 0;
   font-size: 1.3rem;
-  line-height: 1.4; /* סידור חיתוך כותרות בכרטיסיות */
+  line-height: 1.4;
 }
 
 .instructor {
@@ -353,9 +353,7 @@ header p {
   margin-bottom: 2rem;
 }
 
-/* --- Product Upgrades UI --- */
 
-/* הדר עליון וכפתור מועדפים */
 .header-top {
   display: flex;
   justify-content: center;
@@ -365,8 +363,8 @@ header p {
 }
 
 .favorites-counter {
-  position: absolute; /* מוציא את האלמנט מהזרימה הרגילה של ה-Flex */
-  right: 0; /* מצמיד אותו לימין הקיצוני של ה-Header */
+  position: absolute; 
+  right: 0; 
   background: white;
   padding: 8px 16px;
   border-radius: 50px;
@@ -375,10 +373,10 @@ header p {
   box-shadow: var(--shadow-soft);
   font-size: 0.9rem;
   border: 1px solid #e2e8f0;
-  white-space: nowrap; /* מונע מהטקסט לרדת שורה */
+  white-space: nowrap;
 }
 
-/* טאבים (Skills vs Career) */
+
 .search-mode-tabs {
   display: flex;
   justify-content: center;
@@ -409,7 +407,7 @@ header p {
   color: white;
 }
 
-/* אזור חיפוש לפי מקצוע */
+
 .career-section {
   text-align: center;
   margin-bottom: 5rem;
@@ -449,7 +447,7 @@ header p {
   color: var(--accent-purple);
 }
 
-/* סרגל פילטרים */
+
 .filters-bar {
   display: flex;
   align-items: center;
@@ -476,7 +474,7 @@ header p {
   background: #f8fafc;
 }
 
-/* כפתור מועדפים בכרטיסייה */
+
 .fav-btn {
   background: none;
   border: none;
@@ -599,7 +597,7 @@ header p {
   margin-top: 2rem;
 }
 
-/* הקו של ציר הזמן */
+/* time line */
 .roadmap-container::before {
   content: '';
   position: absolute;
